@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Installomator - macOS Software Deployment Script</title>
+    <style>
+        :root {
+            --primary: #0366d6;
+            --primary-hover: #005cc5;
+            --bg-color: #f6f8fa;
+            --text-main: #24292e;
+            --text-muted: #586069;
+            --border-color: #e1e4e8;
+            --white: #ffffff;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            --success-green: #2ea043;
+            --highlight-bg: #f1f8ff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-family);
+            color: var(--text-main);
+            line-height: 1.6;
+            background-color: var(--bg-color);
+        }
+
+        a {
+            text-decoration: none;
+            color: var(--primary);
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* Navigation */
+        header {
+            background-color: var(--white);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo img {
+            height: 32px;
+            width: auto;
+        }
+
+        nav a {
+            margin-left: 1.5rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        nav a:hover {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        /* Hero Section */
+        .hero {
+            background-color: var(--white);
+            text-align: center;
+            padding: 5rem 2rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .hero-title {
+            font-size: 4.5rem;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.05rem;
+            color: var(--text-main);
+        }
+
+        .hero-subtitle {
+            font-size: 1.8rem;
+            font-weight: 300;
+            margin-bottom: 1.5rem;
+            color: var(--text-muted);
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto 2rem auto;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 6px;
+            text-align: center;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--white);
+            border: 1px solid var(--primary);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            text-decoration: none;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--text-muted);
+            text-decoration: none;
+        }
+
+        /* Main Content Container */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        /* Features Grid */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .feature-card {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+
+        .feature-card h3 {
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+            color: var(--primary);
+        }
+
+        .feature-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* Ecosystem / Popularity Section */
+        .ecosystem {
+            background: var(--highlight-bg);
+            border: 1px solid var(--primary);
+            border-radius: 8px;
+            padding: 3rem;
+            margin-bottom: 4rem;
+            text-align: center;
+        }
+
+        .ecosystem h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-main);
+        }
+
+        .stats-grid {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+            flex-wrap: wrap;
+        }
+
+        .stats-grid img {
+            height: 28px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-radius: 4px;
+        }
+
+        .ecosystem > p {
+            color: var(--text-muted);
+            max-width: 800px;
+            margin: 0 auto 2rem auto;
+            font-size: 1.1rem;
+        }
+
+        .ecosystem-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            text-align: left;
+        }
+
+        .project-card {
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            transition: box-shadow 0.2s ease;
+        }
+
+        .project-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .project-card h4 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .project-card p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        /* How it Works Section */
+        .how-it-works {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 4rem;
+        }
+
+        @media (min-width: 768px) {
+            .how-it-works {
+                flex-direction: row;
+            }
+        }
+
+        .how-it-works-content {
+            padding: 3rem;
+            flex: 1;
+        }
+
+        .how-it-works-content h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .process-list {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+
+        .process-list li {
+            position: relative;
+            padding-left: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-muted);
+        }
+
+        .process-list li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--success-green);
+            font-weight: bold;
+        }
+
+        .how-it-works-image {
+            flex: 1;
+            background-color: #ebf0f4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            border-left: 1px solid var(--border-color);
+        }
+
+        .how-it-works-image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .image-caption {
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 1rem;
+        }
+
+        /* Call to Action / Info */
+        .info-section {
+            background-color: var(--white);
+            padding: 4rem 2rem;
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .info-section h2 {
+            margin-bottom: 1rem;
+        }
+
+        .info-section p {
+            color: var(--text-muted);
+            max-width: 700px;
+            margin: 0 auto 1.5rem auto;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            <img src="https://user-images.githubusercontent.com/3985769/203938438-f412c24d-fd5c-458c-a39e-e265dd10ad0b.png" alt="Installomator Logo">
+            Installomator
+        </div>
+        <nav>
+            <a href="https://github.com/Installomator/Installomator/wiki">Documentation</a>
+            <a href="https://github.com/Installomator/Installomator/releases">Releases</a>
+            <a href="https://github.com/Installomator/Installomator">GitHub</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1 class="hero-title">Installomator</h1>
+            <h2 class="hero-subtitle">The one installer script to rule them all.</h2>
+            <p>A single, highly configurable installation script to seamlessly deploy standard software on Macs across your organization.</p>
+            <div class="button-group">
+                <a href="https://github.com/Installomator/Installomator/wiki" class="btn btn-primary">Learn More</a>
+                <a href="https://github.com/Installomator/Installomator" class="btn btn-outline">View Source on GitHub</a>
+            </div>
+        </section>
+
+        <div class="container">
+            <section class="features">
+                <div class="feature-card">
+                    <h3>MDM Agnostic</h3>
+                    <p>Whether you use Jamf Pro, Intune, FileWave, Addigy, Kandji, or Mosyle, Installomator integrates cleanly into your existing management framework as a standardized script.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Label Driven</h3>
+                    <p>Software is organized by "labels". Simply call the script with the desired label (e.g., <code>googlechromepkg</code> or <code>slack</code>) and Installomator handles the rest.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Always Up-to-Date</h3>
+                    <p>Instead of manually packaging browsers and common tools every week, Installomator reaches out to official vendor URLs to fetch the latest available version at runtime.</p>
+                </div>
+            </section>
+
+            <section class="ecosystem">
+                <h2>Trusted by the MacAdmins Community</h2>
+                
+                <div class="stats-grid">
+                    <img src="https://img.shields.io/github/v/release/Installomator/Installomator?style=for-the-badge&color=0366d6" alt="Latest Release">
+                    <img src="https://img.shields.io/github/stars/Installomator/Installomator?style=for-the-badge&color=0366d6" alt="GitHub Stars">
+                    <img src="https://img.shields.io/github/forks/Installomator/Installomator?style=for-the-badge&color=0366d6" alt="GitHub Forks">
+                    <img src="https://img.shields.io/github/downloads/Installomator/Installomator/total?style=for-the-badge&color=0366d6&label=Downloads" alt="Total GitHub Downloads">
+                </div>
+                
+                <p>Installomator isn't just a standalone script—it's a foundational tool in the macOS deployment ecosystem.</p>
+                
+                <div class="ecosystem-grid">
+                    <div class="project-card">
+                        <h4><a href="https://github.com/SecondSonConsulting/Baseline" target="_blank">Baseline</a></h4>
+                        <p>Zero/light-touch macOS setup using swiftDialog + Installomator labels.</p>
+                    </div>
+                    <div class="project-card">
+                        <h4><a href="https://github.com/App-Auto-Patch/App-Auto-Patch" target="_blank">App Auto-Patch</a></h4>
+                        <p>Patching workflow that uses Installomator label/version data for fully automated updates.</p>
+                    </div>
+                    <div class="project-card">
+                        <h4><a href="https://github.com/Mac-Nerd/patchomator" target="_blank">Patchomator</a></h4>
+                        <p>A comprehensive management and patching layer built for Installomator.</p>
+                    </div>
+                    <div class="project-card">
+                        <h4><a href="https://hennig.nu/appar/installomatormate" target="_blank">Installomator Mate</a></h4>
+                        <p>Graphical interface for searching labels, configuring settings, and exporting workflow scripts.</p>
+                    </div>
+                    <div class="project-card">
+                        <h4><a href="https://github.com/liquidz00/Patcher" target="_blank">Patcher</a></h4>
+                        <p>Patching/reporting workflow that matches Jamf patch titles against Installomator’s label catalog.</p>
+                    </div>
+                    <div class="project-card">
+                        <h4><a href="https://github.com/setup-your-mac/SYM-Lite" target="_blank">SYM-Lite</a></h4>
+                        <p>swiftDialog interface for running Installomator labels, Homebrew casks, and Jamf Pro policy triggers.</p>
+                    </div>
+                    <div class="project-card">
+                        <h4><a href="https://github.com/gilburns/Intuneomator" target="_blank">Intuneomator</a></h4>
+                        <p>Intune application lifecycle automation utilizing Installomator’s label database.</p>
+                    </div>
+                    <div class="project-card">
+                        <h4><a href="https://github.com/gilburns/Third-Party-Patcher" target="_blank">Third-Party-Patcher</a></h4>
+                        <p>Daemon-based macOS patching system that downloads installers in the background and prompts users via swiftDialog.</p>
+                    </div>
+                    <div class="project-card">
+                        <h4><a href="https://github.com/jamf/setup-manager" target="_blank">Jamf Setup Manager</a></h4>
+                        <p>Automated setup workflow that leverages Installomator for robust software deployment and management.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="how-it-works">
+                <div class="how-it-works-content">
+                    <h2>Smart, Secure Deployments</h2>
+                    <p style="margin-bottom: 1.5rem; color: var(--text-muted);">Installomator doesn't just blindly download and install software. It runs a series of built-in checks to ensure updates are necessary, secure, and minimally disruptive to the end user.</p>
+                    
+                    <ul class="process-list">
+                        <li><strong>Version Checking:</strong> Compares the currently installed version against the online vendor version.</li>
+                        <li><strong>Strict Security:</strong> Verifies the download is properly signed and notarized by Apple.</li>
+                        <li><strong>User Friendly:</strong> If the application is currently running, Installomator can prompt the user to safely quit the app.</li>
+                        <li><strong>Clean Delivery:</strong> Extracts applications and cleans up any downloaded archive files.</li>
+                    </ul>
+                </div>
+                <div class="how-it-works-image">
+                    <div>
+                        <img src="https://user-images.githubusercontent.com/3985769/203938438-f412c24d-fd5c-458c-a39e-e265dd10ad0b.png" alt="Example of an Installomator user dialog">
+                        <div class="image-caption">Customizable dialogs keep users informed.</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <section class="info-section">
+            <h2>Community & Support</h2>
+            <p>Discussion, support, and advice around Installomator happens in the <strong>#installomator</strong> channel on the <a href="https://macadmins.org/">MacAdmins.org Slack</a>.</p>
+            <p>If you encounter bugs or want to contribute new application labels, please review the <a href="https://github.com/Installomator/Installomator/blob/main/CONTRIBUTING.md">Contribution Guidelines</a> and submit a Pull Request on GitHub.</p>
+            <br>
+            <a href="https://macadmins.org/" class="btn btn-outline">Join MacAdmins Slack</a>
+        </section>
+    </main>
+
+    <footer>
+        <p>Installomator was originally inspired by William Smith and Sander Schram, and created by Armin Briegel.</p>
+        <p>Maintained by the Installomator team: Armin Briegel, Isaac Ordonez, Søren Theilgaard, Adam Codega, Trevor Sysock, Bart Reardon, Richard Glaser, Gil Burns and MacAdmins Community.</p>
+        <p style="margin-top: 1rem;">Released under the Apache 2.0 License.</p>
+    </footer>
+
+</body>
+</html>
